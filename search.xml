@@ -4,11 +4,111 @@
   
     
     <entry>
+      <title>【从零开始的SoftRenderer】3.渲染管线</title>
+      <link href="/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-3-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/"/>
+      <url>/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-3-%E6%B8%B2%E6%9F%93%E7%AE%A1%E7%BA%BF/</url>
+      
+        <content type="html"><![CDATA[<p>&#8195;&#8195;GPU在接受了CPU的指令和数据后，所做的一系列流水线作业，被称作渲染管线。</p><h2 id="GPU渲染管线"><a href="#GPU渲染管线" class="headerlink" title="GPU渲染管线"></a>GPU渲染管线</h2><p><img src="https://img-blog.csdnimg.cn/20200621142528724.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;上图就是GPU渲染管线的图示。图中绿色表示完全可编程，黄色表示可配置，蓝色表示完全固定。下面介绍下一些主要的渲染阶段：</p><ul><li><strong>顶点着色器：</strong> 完全可编程，主要做的是我们在本系列第二章中所讲的坐标变换的过程，所以将输入的顶点乘以MVP矩阵输出，就是一个最简单的顶点着色器。除此之外，这一阶段还可以对一些顶点的属性(法线、纹理等等)进行处理，交给后面的阶段去用。</li><li><strong>裁剪：</strong> 在NDC空间进行裁剪，被截取的三角形会在边界处生成新的顶点。</li><li><strong>屏幕映射：</strong> 将顶点坐标映射到屏幕上，即进行视口变换。</li><li><strong>三角形设置：</strong> 之前所处理的都是顶点，这里则会计算三角形的网格表示数据，以为后面的阶段做准备。</li><li><strong>三角形遍历：</strong> 这里则是本系列第一章讲的内容，即遍历三角形可能覆盖的像素，根据重心坐标确定像素是否在三角形内部，然后则将顶点的各种属性进行插值得到该像素(片元)的属性，交给后面的片元着色器去处理。</li><li><strong>片元着色器：</strong> 根据对三角形各顶点插值得到的属性，决定此片元需要绘制什么颜色。一般各种着色计算都是在此处。</li><li><strong>逐片元操作：</strong> 根据配置对片元进行一各种操作，如：深度测试、模板测试、混合等等。</li></ul><p>&#8195;&#8195;除此之外，还有可选的<strong>曲面细分着色器</strong>和<strong>几何着色器</strong>。<strong>曲面细分着色器</strong>可以将三角形分割成更小的三角形，以提升模型的精度。<strong>几何着色器</strong>则可在多边形网格处理并增删顶点。不过这两个我目前都还没有实践过，理解不够，以后再细讲吧。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 从零开始的SoftRenderer </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>【从零开始的SoftRenderer】2.坐标变换</title>
+      <link href="/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-2-%E5%9D%90%E6%A0%87%E5%8F%98%E6%8D%A2/"/>
+      <url>/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-2-%E5%9D%90%E6%A0%87%E5%8F%98%E6%8D%A2/</url>
+      
+        <content type="html"><![CDATA[<p>&#8195;&#8195;一个物体要投影到屏幕上需要依次经过 Model(世界矩阵，转换到世界空间)、View(视图矩阵，转换到观察空间/摄像机空间)、Projection(投影矩阵，转换到裁剪空间)，合起来就是常见的MVP矩阵。<br>&#8195;&#8195;Model矩阵和View矩阵很好理解，只是单纯的坐标系变换(注：Unity里摄像机坐标系采用的是右手系，与其世界坐标系相反，算是一个小的坑点)，如果有不理解的推荐一个视频课程，<a href="https://space.bilibili.com/88461692#!/channel/detail?cid=9450" target="_blank" rel="noopener">线性代数的本质</a>，这里就不详细说明了。</p><h2 id="齐次坐标"><a href="#齐次坐标" class="headerlink" title="齐次坐标"></a>齐次坐标</h2><p>&#8195;&#8195;在介绍投影矩阵前，我们先来了解下齐次坐标。齐次坐标就是将一个原本是n维的向量用一个n+1维向量来表示，比如三维向量$\displaystyle (x,y,z)$采用$\displaystyle (x,y,z,w)$来表示。其存在的意义有篇文章介绍的很好，这里给出<a href="http://www.songho.ca/math/homogeneous/homogeneous.html" target="_blank" rel="noopener">原文</a>和<a href="https://blog.csdn.net/janestar/article/details/44244849" target="_blank" rel="noopener">译文</a>链接。而在线性变换过程中，齐次坐标的作用主要是提供了位移功能。</p><script type="math/tex; mode=display">\begin{bmatrix}  \color{red}1 & \color{red}0 & \color{red}0 & \color{red}{T_x} \\ \color{green}0 & \color{green}1 & \color{green}0 & \color{green}{T_y} \\ \color{blue}0 & \color{blue}0 & \color{blue}1 & \color{blue}{T_z} \\ \color{purple}0 & \color{purple}0 & \color{purple}0 & \color{purple}1 \end{bmatrix} \cdot \begin{pmatrix} x \\ y \\ z \\ 1 \end{pmatrix} = \begin{pmatrix} x + \color{red}{T_x} \\ y + \color{green}{T_y} \\ z + \color{blue}{T_z} \\ 1 \end{pmatrix}</script><p>&#8195;&#8195;上面就是一个标准的位移变换，移动的距离为$\displaystyle (\color{red}{T_x},\color{green}{T_y},\color{blue}{T_z})$，而齐次坐标$\displaystyle w$则为1(当$\displaystyle w$为0时，则说明$\displaystyle (x,y,z)$代表一个不可位移的向量)。</p><h2 id="投影矩阵"><a href="#投影矩阵" class="headerlink" title="投影矩阵"></a>投影矩阵</h2><p>&#8195;&#8195;这里先推荐一篇很好的<a href="http://www.songho.ca/opengl/gl_projectionmatrix.html" target="_blank" rel="noopener">投影文章</a>。<br>&#8195;&#8195;投影有两种方式，一种是近大远小的透视投影，另一种则是远近一样大的正交投影。我们的摄像机会有一个可视范围，投影要做的其实就是将这个可视范围转换成标准设备坐标(NDC)$\displaystyle ( -1\leqslant x\leqslant 1,-1\leqslant y\leqslant 1,-1\leqslant z\leqslant 1)$，超出此范围的顶点则会进行裁剪。</p><h3 id="透视投影"><a href="#透视投影" class="headerlink" title="透视投影"></a>透视投影</h3><p><img src="https://img-blog.csdnimg.cn/20200618231329484.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;如上图所示，左边是我们摄像机的可视范围，右边则是NDC范围。透视投影的可视范围是一个锥形区域，现在我们需要想办法将其转换成一个正方体范围。这里的$\displaystyle n, f$表示近平面和远平面距摄像机的距离，$\displaystyle l、r、t、b$则为近平面的左、右、上、下。<br><img src="https://img-blog.csdnimg.cn/20200619213827856.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述">&#8195;&#8195;我们先考虑如何求投影坐标的$\displaystyle x$。其实观察空间的原点和目标点相连的直线与近平面相较的坐标点，就是投影的坐标点，而这一点我们可以很容易的通过相似三角形等比计算出来。所以可得$\displaystyle x_p = \frac{n\cdot x_e}{-z_e}$(注：这里$\displaystyle x_e$表示该点在观察空间上的$\displaystyle x$坐标)。同理，$\displaystyle y_p = \frac{n\cdot y_e}{-z_e}$。我们可以先观察下这个坐标，$\displaystyle {z_e}$在分母上，这是一般的矩阵变换不可能得到的结果，我们需要借助齐次坐标来实现，所以我们首先可以确定的是，经透视投影矩阵变换后的坐标的$\displaystyle w$，一定是$\displaystyle {z_e}$的倍数。于是透视投影矩阵的第四行可以确定了。</p><script type="math/tex; mode=display">\left(\begin{matrix}x_c\\y_c\\z_c\\w_c\end{matrix}\right)=\left(\begin{matrix}\cdot & \cdot &\cdot &\cdot\\\cdot & \cdot &\cdot &\cdot\\\cdot & \cdot &\cdot &\cdot\\0 & 0 & -1 & 0\end{matrix}\right) \left(\begin{matrix}x_e\\y_e\\z_e\\w_e\end{matrix}\right),\therefore w_c=-z_e</script><p>&#8195;&#8195;接下来我们来确定$\displaystyle x$和$\displaystyle y$坐标该如何变换。以$\displaystyle x$为例，投影到近平面的点$\displaystyle x_p$的范围是$\displaystyle [l,r]$，我们的目标是将其转换为NDC下的坐标点$\displaystyle x_n$(注：这里的$\displaystyle x_n$是齐次坐标进行了转换后的结果，即$\displaystyle x_n=\frac{x_c}{w_c}=\frac{x_c}{-z_e}$)，而$\displaystyle l$与$\displaystyle r$是对称的，即 $\displaystyle l+r = 0$。所以我们可推得公式：</p><script type="math/tex; mode=display">x_n=\frac{x_p}{r}=\frac{nx_e}{-z_er}</script><p>&#8195;&#8195;同理可得：</p><script type="math/tex; mode=display">y_n=\frac{y_p}{t}=\frac{ny_e}{-z_et}</script><p>&#8195;&#8195;所以矩阵的前两行我们又可以确定了</p><script type="math/tex; mode=display">\left(\begin{matrix}x_c\\y_c\\z_c\\w_c\end{matrix}\right)=\left(\begin{matrix}\frac{n}{r} & 0 & 0 & 0\\0 & \frac{n}{t} & 0 & 0\\\cdot & \cdot & \cdot & \cdot\\0 & 0 & -1 & 0\end{matrix}\right) \left(\begin{matrix}x_e\\y_e\\z_e\\w_e\end{matrix}\right)</script><p>&#8195;&#8195;最后我们来确定$\displaystyle z$轴的变换。在观察空间中$\displaystyle z_e$的范围是$\displaystyle [-n,-f]$，我们希望也能将其转换成NDC空间的$\displaystyle [-1,1]$。因为这个不可能和$\displaystyle x,y$有关，所以我们设矩阵为</p><script type="math/tex; mode=display">\left(\begin{matrix}x_c\\y_c\\z_c\\w_c\end{matrix}\right)=\left(\begin{matrix}\frac{n}{r} & 0 & 0 & 0\\0 & \frac{n}{t} & 0 & 0\\0 & 0 & A & B\\0 & 0 & -1 & 0\end{matrix}\right) \left(\begin{matrix}x_e\\y_e\\z_e\\w_e\end{matrix}\right)</script><p>&#8195;&#8195;可推得</p><script type="math/tex; mode=display">z_n =\frac{z_c}{w_c}= \frac{Az_e + Bw_e}{-z_e}= \frac{Az_e + B}{-z_e}</script><p>&#8195;&#8195;我们可以分别将$\displaystyle (-1,1)$代入$\displaystyle z_n$，$\displaystyle (-n,-f)$代入$\displaystyle z_e$得到方程组</p><script type="math/tex; mode=display">\left\{\begin{array}{lr}-An + B = -n &\\-Af + B = f & \end{array}\right.</script><p>&#8195;&#8195;解该方程组得到</p><script type="math/tex; mode=display">\left\{\begin{array}{lr}A =  -\frac{f+n}{f-n}&\\B = -\frac{2fn}{f-n}& \end{array}\right.</script><p>&#8195;&#8195;所以最终可推得透视投影矩阵</p><script type="math/tex; mode=display">\left(\begin{matrix}x_c\\y_c\\z_c\\w_c\end{matrix}\right)=\left(\begin{matrix}\frac{n}{r} & 0 & 0 & 0\\0 & \frac{n}{t} & 0 & 0\\0 & 0 &  -\frac{f+n}{f-n} & -\frac{2fn}{f-n}\\0 & 0 & -1 & 0\end{matrix}\right) \left(\begin{matrix}x_e\\y_e\\z_e\\w_e\end{matrix}\right)</script><h3 id="正交投影"><a href="#正交投影" class="headerlink" title="正交投影"></a>正交投影</h3><p><img src="https://img-blog.csdnimg.cn/20200620220926399.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;相较于透视投影，正交投影就简单太多了，其转换过程与一般的坐标系变换并没有太大分别，这里就不展开谈了，直接上矩阵：</p><script type="math/tex; mode=display">\left(\begin{matrix}\frac{1}{r} & 0 & 0 & 0\\0 & \frac{1}{t} & 0 & 0\\0 & 0 & \frac{-2}{f-n} & -\frac{f+n}{f-n}\\0 & 0 & 0 & 1\end{matrix}\right)</script><h2 id="视口矩阵"><a href="#视口矩阵" class="headerlink" title="视口矩阵"></a>视口矩阵</h2><p>&#8195;&#8195;视口矩阵既是将NDC下的坐标转换为屏幕上的指定像素区域，也可以理解为该摄像机在屏幕上的显示区域。我这里就偷懒直接覆盖全屏幕了。</p><script type="math/tex; mode=display">\left(\begin{matrix}\frac{width}{2} & 0 & 0 & \frac{width}{2}\\0 & \frac{height}{2} & 0 & \frac{height}{2}\\0 & 0 & 1 & 0\\0 & 0 & 0 & 1\end{matrix}\right)</script><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>&#8195;&#8195;这一章中，我们介绍了三维空间中的坐标是如何一步步转换为屏幕上坐标的，其实这里结合上一章中的绘制三角形，我们就已经可以尝试去渲染3d模型了。所以，下一章则会介绍下最基本的渲染管线。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 从零开始的SoftRenderer </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>【从零开始的SoftRenderer】1.绘制三角形</title>
+      <link href="/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-1-%E7%BB%98%E5%88%B6%E4%B8%89%E8%A7%92%E5%BD%A2/"/>
+      <url>/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-1-%E7%BB%98%E5%88%B6%E4%B8%89%E8%A7%92%E5%BD%A2/</url>
+      
+        <content type="html"><![CDATA[<p>&#8195;&#8195;我们最终是要将三维的物体绘制到平面上，那么首先我们需要明白的是如何在屏幕上绘制二维的物体。而在二维的多边形中，三角形无疑是最特别的一种，它具有以下特性：</p><ol><li>是边数最少多边形</li><li>所有多边形可以都可拆解成三角形</li><li><p>即使在三维空间中，三角形的所有顶点也必然在同一平面上</p><p>&#8195;&#8195;所以我们的软件渲染器的第一步，就是要在屏幕上绘制出一个三角形。绘制三角形的方式多种多样，而光栅化主要采用的是一种叫做重心坐标的方法。</p><h2 id="重心坐标"><a href="#重心坐标" class="headerlink" title="重心坐标"></a>重心坐标</h2><p><img src="https://img-blog.csdnimg.cn/20200617000441399.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;如上图所示，重心坐标的定义为，对于平面内任意一点P，都可以用三角形的三个顶点表示，即 $\displaystyle P\ =\ αA\ +\ βB\ +\ γC$，并且还满足$\displaystyle α\ +\ β\ +\ γ\ =\ 1$。而如果P点在三角形内，那么还会满足$\displaystyle ( 0\leqslant α\leqslant 1,\ 0\leqslant β\leqslant 1,\ 0\leqslant γ\leqslant 1)$。可以类比求两点间一点公式来更好的理解：$\displaystyle P\ =\ αA\ +\ ( 1\ -\ α) B$。<br>&#8195;&#8195;光栅化的过程其实就是求屏幕上每个像素的颜色的过程，所以我们可以遍历三角形可能覆盖的所有点作为点P，求出其重心坐标$\displaystyle(\ α\ ,\ β\ ,\ γ\ )$，然后P点的任意属性(颜色，uv，深度等等)我们都可以通过三角形的三个顶点根据重心坐标插值求得了。下面我们来推导下重心坐标该怎么求。</p></li></ol><h2 id="公式推导"><a href="#公式推导" class="headerlink" title="公式推导"></a>公式推导</h2><p><img src="https://img-blog.csdnimg.cn/2020061708180713.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;根据重心坐标的定义，我们可以把公式改写为</p><script type="math/tex; mode=display">P\ =\ ( 1\ -\ β\ -\ γ) A\ +\ βB\ +\ γC</script><p>&#8195;&#8195;我们还可以进一步将其转换为关于三个向量的公式</p><script type="math/tex; mode=display">\overrightarrow{PA} \ +\ β\overrightarrow{AB} \ +\ γ\overrightarrow{AC} \ =\ \vec{0}</script><p>&#8195;&#8195;这个公式还可以进一步拆成两个公式，分别计算x，y</p><script type="math/tex; mode=display">\overrightarrow{PA}_{x} +\ β\overrightarrow{AB}_{x} +\ γ\overrightarrow{AC}_{x} \ =\ 0</script><script type="math/tex; mode=display">\overrightarrow{PA}_{y} +\ β\overrightarrow{AB}_{y} +\ γ\overrightarrow{AC}_{y} \ =\ 0</script><p>&#8195;&#8195;这两个公式可以再转为矩阵形式表示</p><script type="math/tex; mode=display">\begin{bmatrix}β & γ & 1\end{bmatrix}\begin{bmatrix}\overrightarrow{AB}_{x}\\\overrightarrow{AC}_{x}\\\overrightarrow{PA}_{x}\end{bmatrix} \ =0</script><script type="math/tex; mode=display">\begin{bmatrix}β & γ & 1\end{bmatrix}\begin{bmatrix}\overrightarrow{AB}_{y}\\\overrightarrow{AC}_{y}\\\overrightarrow{PA}_{y}\end{bmatrix} \ =0</script><p>&#8195;&#8195;从上面的公式可以看出，向量$\displaystyle ( β,\ γ,\ 1)$分别与向量$\displaystyle (\overrightarrow{AB}{_x} ,\ \overrightarrow{AC}{_x} ,\ \overrightarrow{PA}{_x})$和向量$\displaystyle (\overrightarrow{AB}{_y} ,\ \overrightarrow{AC}{_y} ,\ \overrightarrow{PA}{_y})$垂直，即是这两个向量的叉乘。假定$\displaystyle (\overrightarrow{AB}{_x} ,\ \overrightarrow{AC}{_x} ,\ \overrightarrow{PA}{_x})$和向量$\displaystyle (\overrightarrow{AB}{_y} ,\ \overrightarrow{AC}{_y} ,\ \overrightarrow{PA}{_y})$的叉乘为向量$\displaystyle u$，那么$\displaystyle β\ =\ u.x\ /\ u.z$，$\displaystyle γ\ =\ u.y\ /\ u.z$。如果$\displaystyle u.z$为0，则说明该三角形其实已经退化成了线段。</p><h2 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h2><figure class="highlight cpp"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="function">Vector3 <span class="title">DrawUtil::CalcuBarycentric</span><span class="params">(Vector2 *pts, Vector2 point)</span> </span>&#123;</span><br><span class="line">    Vector3 temp[<span class="number">2</span>];</span><br><span class="line">     <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">        temp[i][<span class="number">0</span>] = pts[<span class="number">1</span>][i] - pts[<span class="number">0</span>][i];</span><br><span class="line">        temp[i][<span class="number">1</span>] = pts[<span class="number">2</span>][i] - pts[<span class="number">0</span>][i];</span><br><span class="line">        temp[i][<span class="number">2</span>] = pts[<span class="number">0</span>][i] - point[i];</span><br><span class="line">    &#125;</span><br><span class="line">    Vector3 u = temp[<span class="number">0</span>].cross(temp[<span class="number">1</span>]);</span><br><span class="line">    <span class="keyword">if</span> (<span class="built_in">std</span>::<span class="built_in">abs</span>(u.z) &gt; <span class="number">1e-2</span>) &#123;</span><br><span class="line">        <span class="keyword">return</span> Vector3(<span class="number">1.0f</span> - (u.x + u.y) / u.z, u.x / u.z, u.y / u.z);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> Vector3(<span class="number">-1.0f</span>, <span class="number">1.0f</span>, <span class="number">1.0f</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p> &#8195;&#8195;在绘制三角形这一章中，我们着重介绍了重心坐标的定义和推导，有了重心坐标，我们就可以通过三角形三个顶点的各种属性，插值得到三角形内任一点的各种属性。这对于光栅化渲染器是有着相当广泛的应用的，举个例子：<br> &#8195;&#8195; <strong>Z-Buffer</strong>，即深度缓存，当三角形投影到了屏幕上后，它的z值我们并不是直接舍弃不用，相反，我们可以用z值来判断三角形距屏幕的距离，离屏幕近的肯定是会覆盖后面的。但是在空间中，两个三角形是完全可能互相穿插的，所以我们真正要比较的是像素所对应的三角形内的那一点的远近关系，而这一点的z值则是通过对三角形三个顶点z值进行插值得到的。Z-buffer则是用来记录某一像素最近深度的，在绘制过程中如果遇到大于缓存中深度的片段，就会直接舍弃。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 从零开始的SoftRenderer </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
+      <title>【从零开始的SoftRenderer】0.前言</title>
+      <link href="/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-0-%E5%89%8D%E8%A8%80/"/>
+      <url>/2020/06/21/%E4%BB%8E%E9%9B%B6%E5%BC%80%E5%A7%8B%E7%9A%84SoftRenderer-0-%E5%89%8D%E8%A8%80/</url>
+      
+        <content type="html"><![CDATA[<p>&#8195;&#8195;本人图形学萌新一个，之前有跟着<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL</a>进行一点学习，但是总觉得对一些基础的东西并没有真正理解。年前在github上发现一个很不错的工程，<a href="https://github.com/ssloy/tinyrenderer" target="_blank" rel="noopener">tinyrender</a>，便开始跟着上面的介绍开始着手自己写一个软件渲染器，以模拟底层的实现。<br><img src="https://img-blog.csdnimg.cn/20200621125857458.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;<a href="https://github.com/wyk223344/SoftRenderer" target="_blank" rel="noopener">代码链接</a>在此。<br>&#8195;&#8195;其实我这个软件渲染器是一个最简版的，光照、阴影、后处理等等都没有，只是完成了通过摄像机把模型渲染到屏幕这一最基本的流程而已。当时我纠结了一阵该如何设计顶点着色器和片段着色器的结构和数据交互后，便直接滚去玩unity了。或许之后遇到什么我觉得难以理解的图形学知识会再在这个SoftRender上实践下吧。<br>&#8195;&#8195;下面我则就这个渲染器水几篇文章，整理归纳一下所学到的知识。</p><ol><li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-1-绘制三角形/">绘制三角形</a></li><li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-2-坐标变换/">坐标变换</a></li><li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-3-渲染管线/">渲染管线</a></li></ol>]]></content>
+      
+      
+      <categories>
+          
+          <category> 从零开始的SoftRenderer </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> 图形学 </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    
+    
+    <entry>
       <title>Hello World</title>
       <link href="/2020/04/18/hello-world/"/>
       <url>/2020/04/18/hello-world/</url>
       
-        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
+        <content type="html"><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>]]></content>
       
       
       <categories>

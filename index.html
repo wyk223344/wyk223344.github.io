@@ -16,7 +16,7 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
     <title>
         
-          wyk的博客
+          沧海流云的博客
         
     </title>
 
@@ -106,7 +106,7 @@
                 <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
                 
                     <div class="site-heading">
-                        <h1>wyk blog</h1>
+                        <h1>沧海流云的Blog</h1>
                         <!--<hr class="small">-->
                         <span id="subdusi" class="subheading">Good morning, good afternoon, good evening, and good night!</span>
                     </div>
@@ -137,7 +137,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="/">wyk blog</a>
+            <a class="navbar-brand" href="/">沧海流云的Blog</a>
         </div>
 
         <!-- Collect the nav links, forms, and other content for toggling -->
@@ -241,9 +241,153 @@
 
     
 
+    
+
+    
+
+    
+
+    
+
 
 
 <!-- Main Content -->
+
+    
+
+        <div class="post-preview">
+
+            <a href="/2020/06/21/从零开始的SoftRenderer-3-渲染管线/">
+                <h2 class="post-title">
+                    【从零开始的SoftRenderer】3.渲染管线
+                </h2>
+                <h3 class="post-subtitle">
+                    
+                </h3>
+                <div class="post-content-preview">
+                    &#8195;&#8195;GPU在接受了CPU的指令和数据后，所做的一系列流水线作业，被称作渲染管线。
+GPU渲染管线&#8195;&#8195;上图就是GPU渲染管线的图示。图中绿色表示完全可编程，黄色表示可配置，蓝色表示完全固定。下面介绍下一些主要的渲染阶段：
+
+顶点着色器： 完全可编程，主要做的是我们在本系列第二章中所讲的坐标变换的过程，所以将输入的顶点乘以MVP矩阵输出，就是一个最......
+                </div>
+            </a>
+            
+                <p class="post-meta" style="margin: 10px 0;">
+                    Posted by 沧海流云 on
+                    2020-06-21
+                </p>
+                <div class="tags">
+                    
+                      <a href="/tags/#图形学" title="图形学">图形学</a>
+                    
+                </div>
+            
+
+        </div>
+        <hr>
+
+    
+
+    
+
+        <div class="post-preview">
+
+            <a href="/2020/06/21/从零开始的SoftRenderer-2-坐标变换/">
+                <h2 class="post-title">
+                    【从零开始的SoftRenderer】2.坐标变换
+                </h2>
+                <h3 class="post-subtitle">
+                    
+                </h3>
+                <div class="post-content-preview">
+                    &#8195;&#8195;一个物体要投影到屏幕上需要依次经过 Model(世界矩阵，转换到世界空间)、View(视图矩阵，转换到观察空间/摄像机空间)、Projection(投影矩阵，转换到裁剪空间)，合起来就是常见的MVP矩阵。&#8195;&#8195;Model矩阵和View矩阵很好理解，只是单纯的坐标系变换(注：Unity里摄像机坐标系采用的是右手系，与其世界坐标系相反，算是一个小......
+                </div>
+            </a>
+            
+                <p class="post-meta" style="margin: 10px 0;">
+                    Posted by 沧海流云 on
+                    2020-06-21
+                </p>
+                <div class="tags">
+                    
+                      <a href="/tags/#图形学" title="图形学">图形学</a>
+                    
+                </div>
+            
+
+        </div>
+        <hr>
+
+    
+
+    
+
+        <div class="post-preview">
+
+            <a href="/2020/06/21/从零开始的SoftRenderer-1-绘制三角形/">
+                <h2 class="post-title">
+                    【从零开始的SoftRenderer】1.绘制三角形
+                </h2>
+                <h3 class="post-subtitle">
+                    
+                </h3>
+                <div class="post-content-preview">
+                    &#8195;&#8195;我们最终是要将三维的物体绘制到平面上，那么首先我们需要明白的是如何在屏幕上绘制二维的物体。而在二维的多边形中，三角形无疑是最特别的一种，它具有以下特性：
+
+是边数最少多边形
+所有多边形可以都可拆解成三角形
+即使在三维空间中，三角形的所有顶点也必然在同一平面上
+&#8195;&#8195;所以我们的软件渲染器的第一步，就是要在屏幕上绘制出一个三角形。绘制三角形的方式......
+                </div>
+            </a>
+            
+                <p class="post-meta" style="margin: 10px 0;">
+                    Posted by 沧海流云 on
+                    2020-06-21
+                </p>
+                <div class="tags">
+                    
+                      <a href="/tags/#图形学" title="图形学">图形学</a>
+                    
+                </div>
+            
+
+        </div>
+        <hr>
+
+    
+
+    
+
+        <div class="post-preview">
+
+            <a href="/2020/06/21/从零开始的SoftRenderer-0-前言/">
+                <h2 class="post-title">
+                    【从零开始的SoftRenderer】0.前言
+                </h2>
+                <h3 class="post-subtitle">
+                    
+                </h3>
+                <div class="post-content-preview">
+                    &#8195;&#8195;本人图形学萌新一个，之前有跟着LearnOpenGL进行一点学习，但是总觉得对一些基础的东西并没有真正理解。年前在github上发现一个很不错的工程，tinyrender，便开始跟着上面的介绍开始着手自己写一个软件渲染器，以模拟底层的实现。&#8195;&#8195;代码链接在此。&#8195;&#8195;其实我这个软件渲染器是一个最简版的，光照、阴影、后处理等......
+                </div>
+            </a>
+            
+                <p class="post-meta" style="margin: 10px 0;">
+                    Posted by 沧海流云 on
+                    2020-06-21
+                </p>
+                <div class="tags">
+                    
+                      <a href="/tags/#图形学" title="图形学">图形学</a>
+                    
+                </div>
+            
+
+        </div>
+        <hr>
+
+    
 
     
 
@@ -263,7 +407,7 @@ Qu......
             </a>
             
                 <p class="post-meta" style="margin: 10px 0;">
-                    Posted by wyk on
+                    Posted by 沧海流云 on
                     2020-04-18
                 </p>
                 <div class="tags">
@@ -330,6 +474,8 @@ Qu......
     <h5><a href="/tags/">FEATURED TAGS</a></h5>
     <div class="tags">
         
+            <a href="/tags#图形学" title="图形学" rel="4">图形学</a>
+        
             <a href="/tags#随笔" title="随笔" rel="1">随笔</a>
         
     </div>
@@ -348,7 +494,7 @@ Qu......
         
 
         
-            <p>Welcome to visit, I&#39;m wyk!</p>
+            <p>一个很菜但仍坚持努力的游戏客户端。</p>
         
 
         <!-- SNS Link -->
@@ -370,6 +516,26 @@ Qu......
             
 
             
+                <li>
+                    <a target="_blank" href="https://www.zhihu.com/people/wang-yan-kun-67-46">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa  fa-stack-1x fa-inverse">知</i>
+                        </span>
+                    </a>
+                </li>
+            
+
+            
+                <li>
+                    <a target="_blank" href="https://blog.csdn.net/wyk223344">
+                        <span class="fa-stack fa-lg">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa  fa-stack-1x fa-inverse">C</i>
+                        </span>
+                    </a>
+                </li>
+            
 
             
 
@@ -383,23 +549,24 @@ Qu......
         <hr>
     
         
-  <h5>RECENT POSTS</h5>
-  <div class="widget">
-    <ul>
-      
-        <li>
-          <a href="/2020/04/18/hello-world/">Hello World</a>
-        </li>
-      
-    </ul>
-  </div>
+    <h5>ARCHIVES</h5>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/06/">六月 2020</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li></ul>
+    </div>
 
         <hr>
     
-        
-    <h5>ARCHIVES</h5>
+        <!-- Categories -->
+
+    <h5>categories</h5>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2020/04/">四月 2020</a><span class="archive-list-count">1</span></li></ul>
+      <ul>
+        
+          <a href="categories/#从零开始的SoftRenderer"><li>从零开始的SoftRenderer</li></a>
+        
+          <a href="categories/#闲谈"><li>闲谈</li></a>
+        
+      </ul>
     </div>
 
         <hr>
@@ -435,6 +602,26 @@ Qu......
                 
 
                 
+                    <li>
+                        <a target="_blank" href="https://www.zhihu.com/people/wang-yan-kun-67-46">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">知</i>
+                            </span>
+                        </a>
+                    </li>
+                
+
+                
+                    <li>
+                        <a target="_blank" href="https://blog.csdn.net/wyk223344">
+                            <span class="fa-stack fa-lg">
+                                <i class="fa fa-circle fa-stack-2x"></i>
+                                <i class="fa  fa-stack-1x fa-inverse">C</i>
+                            </span>
+                        </a>
+                    </li>
+                
 
                 
 
@@ -444,7 +631,7 @@ Qu......
 
                 </ul>
                 <p class="copyright text-muted">
-                    Copyright &copy; wyk 2020 
+                    Copyright &copy; 沧海流云 2020 
                     <!-- <br>
                     Powered by 
                     <a href="https://github.com/dusign/hexo-theme-snail" target="_blank" rel="noopener">

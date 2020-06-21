@@ -16,11 +16,11 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
     <title>
         
-          Hello World - 沧海流云的博客
+          【从零开始的SoftRenderer】3.渲染管线 - 沧海流云的博客
         
     </title>
 
-    <link rel="canonical" href="http://wyk223344.gitee.io/2020/04/18/hello-world/">
+    <link rel="canonical" href="http://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-3-渲染管线/">
 
     <!-- Bootstrap Core CSS -->
     
@@ -108,14 +108,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                              <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                             
                         </div>
-                        <h1>Hello World</h1>
+                        <h1>【从零开始的SoftRenderer】3.渲染管线</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by 沧海流云 on
-                            2020-04-18
+                            2020-06-21
                         </span>
 
                         
@@ -246,24 +246,28 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+                <p>&#8195;&#8195;GPU在接受了CPU的指令和数据后，所做的一系列流水线作业，被称作渲染管线。</p>
+<h2 id="GPU渲染管线"><a href="#GPU渲染管线" class="headerlink" title="GPU渲染管线"></a>GPU渲染管线</h2><p><img src="https://img-blog.csdnimg.cn/20200621142528724.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;上图就是GPU渲染管线的图示。图中绿色表示完全可编程，黄色表示可配置，蓝色表示完全固定。下面介绍下一些主要的渲染阶段：</p>
+<ul>
+<li><strong>顶点着色器：</strong> 完全可编程，主要做的是我们在本系列第二章中所讲的坐标变换的过程，所以将输入的顶点乘以MVP矩阵输出，就是一个最简单的顶点着色器。除此之外，这一阶段还可以对一些顶点的属性(法线、纹理等等)进行处理，交给后面的阶段去用。</li>
+<li><strong>裁剪：</strong> 在NDC空间进行裁剪，被截取的三角形会在边界处生成新的顶点。</li>
+<li><strong>屏幕映射：</strong> 将顶点坐标映射到屏幕上，即进行视口变换。</li>
+<li><strong>三角形设置：</strong> 之前所处理的都是顶点，这里则会计算三角形的网格表示数据，以为后面的阶段做准备。</li>
+<li><strong>三角形遍历：</strong> 这里则是本系列第一章讲的内容，即遍历三角形可能覆盖的像素，根据重心坐标确定像素是否在三角形内部，然后则将顶点的各种属性进行插值得到该像素(片元)的属性，交给后面的片元着色器去处理。</li>
+<li><strong>片元着色器：</strong> 根据对三角形各顶点插值得到的属性，决定此片元需要绘制什么颜色。一般各种着色计算都是在此处。</li>
+<li><strong>逐片元操作：</strong> 根据配置对片元进行一各种操作，如：深度测试、模板测试、混合等等。</li>
+</ul>
+<p>&#8195;&#8195;除此之外，还有可选的<strong>曲面细分着色器</strong>和<strong>几何着色器</strong>。<strong>曲面细分着色器</strong>可以将三角形分割成更小的三角形，以提升模型的精度。<strong>几何着色器</strong>则可在多边形网格处理并增删顶点。不过这两个我目前都还没有实践过，理解不够，以后再细讲吧。</p>
 
                 
                 <hr>
                 <!-- Pager -->
                 <ul class="pager">
                     
-                    <li class="previous">
-                        <a href="/2020/06/21/从零开始的SoftRenderer-0-前言/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】0.前言">&larr; Previous Post</a>
-                    </li>
                     
+                    <li class="next">
+                        <a href="/2020/06/21/从零开始的SoftRenderer-2-坐标变换/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】2.坐标变换">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -385,7 +389,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                          <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                         
                     </div>
                 </section>

@@ -16,11 +16,11 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
     <title>
         
-          Hello World - 沧海流云的博客
+          【从零开始的SoftRenderer】0.前言 - 沧海流云的博客
         
     </title>
 
-    <link rel="canonical" href="http://wyk223344.gitee.io/2020/04/18/hello-world/">
+    <link rel="canonical" href="http://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-0-前言/">
 
     <!-- Bootstrap Core CSS -->
     
@@ -108,14 +108,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                              <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                             
                         </div>
-                        <h1>Hello World</h1>
+                        <h1>【从零开始的SoftRenderer】0.前言</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by 沧海流云 on
-                            2020-04-18
+                            2020-06-21
                         </span>
 
                         
@@ -246,14 +246,12 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+                <p>&#8195;&#8195;本人图形学萌新一个，之前有跟着<a href="https://learnopengl-cn.github.io/" target="_blank" rel="noopener">LearnOpenGL</a>进行一点学习，但是总觉得对一些基础的东西并没有真正理解。年前在github上发现一个很不错的工程，<a href="https://github.com/ssloy/tinyrenderer" target="_blank" rel="noopener">tinyrender</a>，便开始跟着上面的介绍开始着手自己写一个软件渲染器，以模拟底层的实现。<br><img src="https://img-blog.csdnimg.cn/20200621125857458.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;<a href="https://github.com/wyk223344/SoftRenderer" target="_blank" rel="noopener">代码链接</a>在此。<br>&#8195;&#8195;其实我这个软件渲染器是一个最简版的，光照、阴影、后处理等等都没有，只是完成了通过摄像机把模型渲染到屏幕这一最基本的流程而已。当时我纠结了一阵该如何设计顶点着色器和片段着色器的结构和数据交互后，便直接滚去玩unity了。或许之后遇到什么我觉得难以理解的图形学知识会再在这个SoftRender上实践下吧。<br>&#8195;&#8195;下面我则就这个渲染器水几篇文章，整理归纳一下所学到的知识。</p>
+<ol>
+<li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-1-绘制三角形/">绘制三角形</a></li>
+<li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-2-坐标变换/">坐标变换</a></li>
+<li><a href="https://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-3-渲染管线/">渲染管线</a></li>
+</ol>
 
                 
                 <hr>
@@ -261,9 +259,13 @@
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2020/06/21/从零开始的SoftRenderer-0-前言/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】0.前言">&larr; Previous Post</a>
+                        <a href="/2020/06/21/从零开始的SoftRenderer-1-绘制三角形/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】1.绘制三角形">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2020/04/18/hello-world/" data-toggle="tooltip" data-placement="top" title="Hello World">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -385,7 +387,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                          <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                         
                     </div>
                 </section>

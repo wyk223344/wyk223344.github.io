@@ -16,11 +16,11 @@
     <!--<link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>-->
     <title>
         
-          Hello World - 沧海流云的博客
+          【从零开始的SoftRenderer】2.坐标变换 - 沧海流云的博客
         
     </title>
 
-    <link rel="canonical" href="http://wyk223344.gitee.io/2020/04/18/hello-world/">
+    <link rel="canonical" href="http://wyk223344.gitee.io/2020/06/21/从零开始的SoftRenderer-2-坐标变换/">
 
     <!-- Bootstrap Core CSS -->
     
@@ -108,14 +108,14 @@
                     <div class="post-heading">
                         <div class="tags">
                             
-                              <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                              <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                             
                         </div>
-                        <h1>Hello World</h1>
+                        <h1>【从零开始的SoftRenderer】2.坐标变换</h1>
                         <h2 class="subheading"></h2>
                         <span class="meta">
                             Posted by 沧海流云 on
-                            2020-04-18
+                            2020-06-21
                         </span>
 
                         
@@ -246,14 +246,142 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-                <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+                <p>&#8195;&#8195;一个物体要投影到屏幕上需要依次经过 Model(世界矩阵，转换到世界空间)、View(视图矩阵，转换到观察空间/摄像机空间)、Projection(投影矩阵，转换到裁剪空间)，合起来就是常见的MVP矩阵。<br>&#8195;&#8195;Model矩阵和View矩阵很好理解，只是单纯的坐标系变换(注：Unity里摄像机坐标系采用的是右手系，与其世界坐标系相反，算是一个小的坑点)，如果有不理解的推荐一个视频课程，<a href="https://space.bilibili.com/88461692#!/channel/detail?cid=9450" target="_blank" rel="noopener">线性代数的本质</a>，这里就不详细说明了。</p>
+<h2 id="齐次坐标"><a href="#齐次坐标" class="headerlink" title="齐次坐标"></a>齐次坐标</h2><p>&#8195;&#8195;在介绍投影矩阵前，我们先来了解下齐次坐标。齐次坐标就是将一个原本是n维的向量用一个n+1维向量来表示，比如三维向量$\displaystyle (x,y,z)$采用$\displaystyle (x,y,z,w)$来表示。其存在的意义有篇文章介绍的很好，这里给出<a href="http://www.songho.ca/math/homogeneous/homogeneous.html" target="_blank" rel="noopener">原文</a>和<a href="https://blog.csdn.net/janestar/article/details/44244849" target="_blank" rel="noopener">译文</a>链接。而在线性变换过程中，齐次坐标的作用主要是提供了位移功能。</p>
+<script type="math/tex; mode=display">
+\begin{bmatrix}  \color{red}1 & \color{red}0 & \color{red}0 & \color{red}{T_x} \\ \color{green}0 & \color{green}1 & \color{green}0 & \color{green}{T_y} \\ \color{blue}0 & \color{blue}0 & \color{blue}1 & \color{blue}{T_z} \\ \color{purple}0 & \color{purple}0 & \color{purple}0 & \color{purple}1 \end{bmatrix} \cdot \begin{pmatrix} x \\ y \\ z \\ 1 \end{pmatrix} = \begin{pmatrix} x + \color{red}{T_x} \\ y + \color{green}{T_y} \\ z + \color{blue}{T_z} \\ 1 \end{pmatrix}</script><p>&#8195;&#8195;上面就是一个标准的位移变换，移动的距离为$\displaystyle (\color{red}{T_x},\color{green}{T_y},\color{blue}{T_z})$，而齐次坐标$\displaystyle w$则为1(当$\displaystyle w$为0时，则说明$\displaystyle (x,y,z)$代表一个不可位移的向量)。</p>
+<h2 id="投影矩阵"><a href="#投影矩阵" class="headerlink" title="投影矩阵"></a>投影矩阵</h2><p>&#8195;&#8195;这里先推荐一篇很好的<a href="http://www.songho.ca/opengl/gl_projectionmatrix.html" target="_blank" rel="noopener">投影文章</a>。<br>&#8195;&#8195;投影有两种方式，一种是近大远小的透视投影，另一种则是远近一样大的正交投影。我们的摄像机会有一个可视范围，投影要做的其实就是将这个可视范围转换成标准设备坐标(NDC)$\displaystyle ( -1\leqslant x\leqslant 1,-1\leqslant y\leqslant 1,-1\leqslant z\leqslant 1)$，超出此范围的顶点则会进行裁剪。</p>
+<h3 id="透视投影"><a href="#透视投影" class="headerlink" title="透视投影"></a>透视投影</h3><p><img src="https://img-blog.csdnimg.cn/20200618231329484.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;如上图所示，左边是我们摄像机的可视范围，右边则是NDC范围。透视投影的可视范围是一个锥形区域，现在我们需要想办法将其转换成一个正方体范围。这里的$\displaystyle n, f$表示近平面和远平面距摄像机的距离，$\displaystyle l、r、t、b$则为近平面的左、右、上、下。<br><img src="https://img-blog.csdnimg.cn/20200619213827856.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述">&#8195;&#8195;我们先考虑如何求投影坐标的$\displaystyle x$。其实观察空间的原点和目标点相连的直线与近平面相较的坐标点，就是投影的坐标点，而这一点我们可以很容易的通过相似三角形等比计算出来。所以可得$\displaystyle x_p = \frac{n\cdot x_e}{-z_e}$(注：这里$\displaystyle x_e$表示该点在观察空间上的$\displaystyle x$坐标)。同理，$\displaystyle y_p = \frac{n\cdot y_e}{-z_e}$。我们可以先观察下这个坐标，$\displaystyle {z_e}$在分母上，这是一般的矩阵变换不可能得到的结果，我们需要借助齐次坐标来实现，所以我们首先可以确定的是，经透视投影矩阵变换后的坐标的$\displaystyle w$，一定是$\displaystyle {z_e}$的倍数。于是透视投影矩阵的第四行可以确定了。</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+x_c\\
+y_c\\
+z_c\\
+w_c
+\end{matrix}
+\right)=\left(
+\begin{matrix}
+\cdot & \cdot &\cdot &\cdot\\
+\cdot & \cdot &\cdot &\cdot\\
+\cdot & \cdot &\cdot &\cdot\\
+0 & 0 & -1 & 0
+\end{matrix}
+\right) \left(
+\begin{matrix}
+x_e\\
+y_e\\
+z_e\\
+w_e
+\end{matrix}
+\right),
+\therefore w_c=-z_e</script><p>&#8195;&#8195;接下来我们来确定$\displaystyle x$和$\displaystyle y$坐标该如何变换。以$\displaystyle x$为例，投影到近平面的点$\displaystyle x_p$的范围是$\displaystyle [l,r]$，我们的目标是将其转换为NDC下的坐标点$\displaystyle x_n$(注：这里的$\displaystyle x_n$是齐次坐标进行了转换后的结果，即$\displaystyle x_n=\frac{x_c}{w_c}=\frac{x_c}{-z_e}$)，而$\displaystyle l$与$\displaystyle r$是对称的，即 $\displaystyle l+r = 0$。所以我们可推得公式：</p>
+<script type="math/tex; mode=display">
+x_n=\frac{x_p}{r}=\frac{nx_e}{-z_er}</script><p>&#8195;&#8195;同理可得：</p>
+<script type="math/tex; mode=display">
+y_n=\frac{y_p}{t}=\frac{ny_e}{-z_et}</script><p>&#8195;&#8195;所以矩阵的前两行我们又可以确定了</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+x_c\\
+y_c\\
+z_c\\
+w_c
+\end{matrix}
+\right)=\left(
+\begin{matrix}
+\frac{n}{r} & 0 & 0 & 0\\
+0 & \frac{n}{t} & 0 & 0\\
+\cdot & \cdot & \cdot & \cdot\\
+0 & 0 & -1 & 0
+\end{matrix}
+\right) \left(
+\begin{matrix}
+x_e\\
+y_e\\
+z_e\\
+w_e
+\end{matrix}
+\right)</script><p>&#8195;&#8195;最后我们来确定$\displaystyle z$轴的变换。在观察空间中$\displaystyle z_e$的范围是$\displaystyle [-n,-f]$，我们希望也能将其转换成NDC空间的$\displaystyle [-1,1]$。因为这个不可能和$\displaystyle x,y$有关，所以我们设矩阵为</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+x_c\\
+y_c\\
+z_c\\
+w_c
+\end{matrix}
+\right)=\left(
+\begin{matrix}
+\frac{n}{r} & 0 & 0 & 0\\
+0 & \frac{n}{t} & 0 & 0\\
+0 & 0 & A & B\\
+0 & 0 & -1 & 0
+\end{matrix}
+\right) \left(
+\begin{matrix}
+x_e\\
+y_e\\
+z_e\\
+w_e
+\end{matrix}
+\right)</script><p>&#8195;&#8195;可推得</p>
+<script type="math/tex; mode=display">z_n =\frac{z_c}{w_c}= \frac{Az_e + Bw_e}{-z_e}= \frac{Az_e + B}{-z_e}</script><p>&#8195;&#8195;我们可以分别将$\displaystyle (-1,1)$代入$\displaystyle z_n$，$\displaystyle (-n,-f)$代入$\displaystyle z_e$得到方程组</p>
+<script type="math/tex; mode=display">
+\left\{
+\begin{array}{lr}
+-An + B = -n &\\
+-Af + B = f & 
+\end{array}
+\right.</script><p>&#8195;&#8195;解该方程组得到</p>
+<script type="math/tex; mode=display">
+\left\{
+\begin{array}{lr}
+A =  -\frac{f+n}{f-n}&\\
+B = -\frac{2fn}{f-n}& 
+\end{array}
+\right.</script><p>&#8195;&#8195;所以最终可推得透视投影矩阵</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+x_c\\
+y_c\\
+z_c\\
+w_c
+\end{matrix}
+\right)=\left(
+\begin{matrix}
+\frac{n}{r} & 0 & 0 & 0\\
+0 & \frac{n}{t} & 0 & 0\\
+0 & 0 &  -\frac{f+n}{f-n} & -\frac{2fn}{f-n}\\
+0 & 0 & -1 & 0
+\end{matrix}
+\right) \left(
+\begin{matrix}
+x_e\\
+y_e\\
+z_e\\
+w_e
+\end{matrix}
+\right)</script><h3 id="正交投影"><a href="#正交投影" class="headerlink" title="正交投影"></a>正交投影</h3><p><img src="https://img-blog.csdnimg.cn/20200620220926399.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3d5azIyMzM0NA==,size_16,color_FFFFFF,t_70#pic_center" alt="在这里插入图片描述"><br>&#8195;&#8195;相较于透视投影，正交投影就简单太多了，其转换过程与一般的坐标系变换并没有太大分别，这里就不展开谈了，直接上矩阵：</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+\frac{1}{r} & 0 & 0 & 0\\
+0 & \frac{1}{t} & 0 & 0\\
+0 & 0 & \frac{-2}{f-n} & -\frac{f+n}{f-n}\\
+0 & 0 & 0 & 1
+\end{matrix}
+\right)</script><h2 id="视口矩阵"><a href="#视口矩阵" class="headerlink" title="视口矩阵"></a>视口矩阵</h2><p>&#8195;&#8195;视口矩阵既是将NDC下的坐标转换为屏幕上的指定像素区域，也可以理解为该摄像机在屏幕上的显示区域。我这里就偷懒直接覆盖全屏幕了。</p>
+<script type="math/tex; mode=display">
+\left(
+\begin{matrix}
+\frac{width}{2} & 0 & 0 & \frac{width}{2}\\
+0 & \frac{height}{2} & 0 & \frac{height}{2}\\
+0 & 0 & 1 & 0\\
+0 & 0 & 0 & 1
+\end{matrix}
+\right)</script><h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>&#8195;&#8195;这一章中，我们介绍了三维空间中的坐标是如何一步步转换为屏幕上坐标的，其实这里结合上一章中的绘制三角形，我们就已经可以尝试去渲染3d模型了。所以，下一章则会介绍下最基本的渲染管线。</p>
 
                 
                 <hr>
@@ -261,9 +389,13 @@
                 <ul class="pager">
                     
                     <li class="previous">
-                        <a href="/2020/06/21/从零开始的SoftRenderer-0-前言/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】0.前言">&larr; Previous Post</a>
+                        <a href="/2020/06/21/从零开始的SoftRenderer-3-渲染管线/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】3.渲染管线">&larr; Previous Post</a>
                     </li>
                     
+                    
+                    <li class="next">
+                        <a href="/2020/06/21/从零开始的SoftRenderer-1-绘制三角形/" data-toggle="tooltip" data-placement="top" title="【从零开始的SoftRenderer】1.绘制三角形">Next Post &rarr;</a>
+                    </li>
                     
                 </ul>
 
@@ -385,7 +517,7 @@
                     <h5><a href="/tags/">FEATURED TAGS</a></h5>
                     <div class="tags">
                        
-                          <a class="tag" href="/tags/#随笔" title="随笔">随笔</a>
+                          <a class="tag" href="/tags/#图形学" title="图形学">图形学</a>
                         
                     </div>
                 </section>
